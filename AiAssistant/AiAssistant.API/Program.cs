@@ -1,16 +1,33 @@
 using System.Security.Claims;
 using System.Text.Json;
+using AiAssistant.API.Utils;
+using AiAssistant.API.Utils.Configs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+// Config bindings
+builder.Services.Configure<DatabaseConfig>(builder.Configuration.GetSection("Database"));
+builder.Services.Configure<OllamaConfig>(builder.Configuration.GetSection("Ollama"));
+builder.Services.Configure<QdrantConfig>(builder.Configuration.GetSection("Qdrant"));
+
+// Ollama HTTP client — base URL from config
+builder.Services.AddHttpClient<OllamaClient>((sp, client) =>
+{
+    var cfg = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<OllamaConfig>>().Value;
+    client.BaseAddress = new Uri(cfg.BaseUrl);
+    client.Timeout = TimeSpan.FromMinutes(10);
+});
+
+// Application services
+builder.Services.AddSingleton<QdrantService>();
+builder.Services.AddScoped<SqlAgentService>();
+builder.Services.AddScoped<DocumentAgentService>();
+builder.Services.AddSingleton<PdfChunker>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -32,9 +49,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 if (context.Principal?.Identity is not ClaimsIdentity identity)
                     return Task.CompletedTask;
 
-                // Keycloak puts realm roles inside "realm_access": { "roles": [...] }
-                // which the JWT handler stores as a single JSON string claim.
-                // Map them to ClaimTypes.Role so [Authorize(Roles = "...")] works.
                 var realmAccessClaim = identity.FindFirst("realm_access");
                 if (realmAccessClaim is null)
                     return Task.CompletedTask;
@@ -66,16 +80,14 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

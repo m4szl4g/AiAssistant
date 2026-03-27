@@ -8,9 +8,16 @@ services:
       - "5221:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      Qdrant__Url: http://qdrant:6333
+      Qdrant__Host: qdrant
+      Qdrant__Port: 6334
+      Ollama__BaseUrl: http://ollama:11434
+      # JWKS lekérés a belső Docker hálózaton keresztül
+      Keycloak__Authority: http://keycloak:8080/realms/ai-assistant
+      # A Postman/böngésző által kapott token iss claim-je (külső URL)
+      Keycloak__TokenIssuer: http://localhost:8190/realms/ai-assistant
     depends_on:
       - qdrant
+      - ollama
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.0
@@ -32,5 +39,24 @@ services:
       - qdrant_storage:/qdrant/storage
     restart: unless-stopped
 
+  ollama:
+    image: ollama/ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+    # Pull models on first start; subsequent starts use cached models from the volume.
+    entrypoint: /bin/bash
+    command: >
+      -c "
+      ollama serve &
+      until ollama list 2>/dev/null; do sleep 2; done &&
+      ollama pull llama3.2:1b || true &&
+      ollama pull qwen2.5:1.5b || true &&
+      ollama pull bge-m3 || true &&
+      wait
+      "
 volumes:
   qdrant_storage:
+  ollama_data:

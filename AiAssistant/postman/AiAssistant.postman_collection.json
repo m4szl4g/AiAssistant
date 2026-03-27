@@ -1,0 +1,285 @@
+{
+  "info": {
+    "name": "AiAssistant API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url",      "value": "http://localhost:5221" },
+    { "key": "keycloak_url",  "value": "http://localhost:8190" },
+    { "key": "client_id",     "value": "ai-assistant-api-test" },
+    { "key": "token",         "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Get Token – HR (mikloscsaba)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.access_token) {",
+                  "    pm.collectionVariables.set('token', json.access_token);",
+                  "    console.log('Token saved.');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "grant_type", "value": "password" },
+                { "key": "client_id",  "value": "{{client_id}}" },
+                { "key": "username",   "value": "mikloscsaba" },
+                { "key": "password",   "value": "{{password}}" }
+              ]
+            },
+            "url": {
+              "raw": "{{keycloak_url}}/realms/ai-assistant/protocol/openid-connect/token",
+              "host": ["{{keycloak_url}}"],
+              "path": ["realms", "ai-assistant", "protocol", "openid-connect", "token"]
+            }
+          }
+        },
+        {
+          "name": "Get Token – User (butorgergo)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.access_token) {",
+                  "    pm.collectionVariables.set('token', json.access_token);",
+                  "    console.log('Token saved.');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "grant_type", "value": "password" },
+                { "key": "client_id",  "value": "{{client_id}}" },
+                { "key": "username",   "value": "butorgergo" },
+                { "key": "password",   "value": "{{password}}" }
+              ]
+            },
+            "url": {
+              "raw": "{{keycloak_url}}/realms/ai-assistant/protocol/openid-connect/token",
+              "host": ["{{keycloak_url}}"],
+              "path": ["realms", "ai-assistant", "protocol", "openid-connect", "token"]
+            }
+          }
+        },
+        {
+          "name": "Get Token – CEO (johndoe)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.access_token) {",
+                  "    pm.collectionVariables.set('token', json.access_token);",
+                  "    console.log('Token saved.');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "grant_type", "value": "password" },
+                { "key": "client_id",  "value": "{{client_id}}" },
+                { "key": "username",   "value": "johndoe" },
+                { "key": "password",   "value": "{{password}}" }
+              ]
+            },
+            "url": {
+              "raw": "{{keycloak_url}}/realms/ai-assistant/protocol/openid-connect/token",
+              "host": ["{{keycloak_url}}"],
+              "path": ["realms", "ai-assistant", "protocol", "openid-connect", "token"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Documents",
+      "item": [
+        {
+          "name": "Upload PDF (HR only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "",
+                  "description": "Select a PDF file"
+                },
+                {
+                  "key": "tags",
+                  "value": "HR Policy,Benefits",
+                  "type": "text",
+                  "description": "Comma-separated or JSON array: [\"HR Policy\",\"Benefits\"]"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/document/upload",
+              "host": ["{{base_url}}"],
+              "path": ["api", "document", "upload"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Prompt",
+      "item": [
+        {
+          "name": "SQL Query",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"List all employees\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/prompt",
+              "host": ["{{base_url}}"],
+              "path": ["api", "prompt"]
+            }
+          }
+        },
+        {
+          "name": "Document Search",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Mi a szabadságolási rend?\",\n  \"tags\": [\"HR Policy\"]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/prompt/document",
+              "host": ["{{base_url}}"],
+              "path": ["api", "prompt", "document"]
+            }
+          }
+        },
+        {
+          "name": "Document Search – tag szűrő nélkül",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Milyen juttatások járnak az alkalmazottaknak?\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/prompt/document",
+              "host": ["{{base_url}}"],
+              "path": ["api", "prompt", "document"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth check – 401 tesztek",
+      "item": [
+        {
+          "name": "Prompt token nélkül – 401",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"test\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/prompt",
+              "host": ["{{base_url}}"],
+              "path": ["api", "prompt"]
+            }
+          }
+        },
+        {
+          "name": "Upload user tokennel – 403 (nem HR)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "",
+                  "description": "Bármilyen PDF"
+                },
+                {
+                  "key": "tags",
+                  "value": "test",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/document/upload",
+              "host": ["{{base_url}}"],
+              "path": ["api", "document", "upload"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

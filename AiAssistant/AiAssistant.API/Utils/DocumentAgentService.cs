@@ -9,15 +9,18 @@ namespace AiAssistant.API.Utils
         private const string NoAnswerText = "NEM TALÁLHATÓ MEG A MEGADOTT KONTEXTUSBAN.";
 
         private readonly OllamaClient _ollama;
+        private readonly OpenAiClient _openAi;
         private readonly string _model;
         private readonly ILogger<DocumentAgentService> _logger;
 
         public DocumentAgentService(
             OllamaClient ollama,
+            OpenAiClient openAi,
             IOptions<OllamaConfig> config,
             ILogger<DocumentAgentService> logger)
         {
             _ollama = ollama;
+            _openAi = openAi;
             _model = config.Value.GenerateModel;
             _logger = logger;
         }
@@ -76,7 +79,19 @@ namespace AiAssistant.API.Utils
 
             try
             {
-                var rawAnswer = await _ollama.GenerateAsync(prompt, _model);
+                var ollamaTask = _ollama.GenerateAsync(prompt, _model);
+                var gptTask = _openAi.ChatAsync(
+                    "You are a document search assistant. Answer ONLY from the provided context. If the answer is not in the context, write only: NEM TALÁLHATÓ MEG A MEGADOTT KONTEXTUSBAN.",
+                    $"CONTEXT:\n{context}\n\nQUESTION: {question}\n\nANSWER (Hungarian, one sentence max):",
+                    cancellationToken);
+
+                await Task.WhenAll((Task)ollamaTask, (Task)gptTask);
+
+                var rawAnswer = await ollamaTask;
+                var gptAnswer = await gptTask;
+
+                _logger.LogInformation("GPT answer received. Configured={Configured}, Answer='{Answer}'",
+                    _openAi.IsConfigured, gptAnswer ?? "(not configured)");
 
                 if (string.IsNullOrWhiteSpace(rawAnswer))
                 {
@@ -106,6 +121,7 @@ namespace AiAssistant.API.Utils
                 return new DocumentAnswerResult
                 {
                     Answer = cleanedAnswer,
+                    GptAnswer = gptAnswer,
                     EvidenceFound = evidenceFound,
                     Reason = evidenceFound
                         ? "Answer generated from retrieved context."
@@ -174,6 +190,7 @@ ANSWER (Hungarian, one sentence max):
     public class DocumentAnswerResult
     {
         public string Answer { get; set; } = string.Empty;
+        public string? GptAnswer { get; set; }
         public bool EvidenceFound { get; set; }
         public string Reason { get; set; } = string.Empty;
         public string UsedModel { get; set; } = string.Empty;

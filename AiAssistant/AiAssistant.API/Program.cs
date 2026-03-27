@@ -14,6 +14,18 @@ builder.Services.AddOpenApi();
 builder.Services.Configure<DatabaseConfig>(builder.Configuration.GetSection("Database"));
 builder.Services.Configure<OllamaConfig>(builder.Configuration.GetSection("Ollama"));
 builder.Services.Configure<QdrantConfig>(builder.Configuration.GetSection("Qdrant"));
+builder.Services.Configure<OpenAiConfig>(builder.Configuration.GetSection("OpenAi"));
+
+// OpenAI HTTP client
+builder.Services.AddHttpClient<OpenAiClient>((sp, client) =>
+{
+    var cfg = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<OpenAiConfig>>().Value;
+    client.BaseAddress = new Uri(cfg.BaseUrl);
+    client.Timeout = TimeSpan.FromSeconds(60);
+    if (!string.IsNullOrWhiteSpace(cfg.ApiKey))
+        client.DefaultRequestHeaders.Authorization =
+            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", cfg.ApiKey);
+});
 
 // Ollama HTTP client — base URL from config
 builder.Services.AddHttpClient<OllamaClient>((sp, client) =>

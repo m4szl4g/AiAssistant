@@ -1,0 +1,157 @@
+{
+  "id": "ai-assistant",
+  "realm": "ai-assistant",
+  "displayName": "ai-assistant",
+  "enabled": true,
+  "registrationAllowed": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 36000,
+  "accessTokenLifespan": 300,
+  "refreshTokenMaxReuse": 0,
+  "revokeRefreshToken": false,
+
+  "roles": {
+    "realm": [
+      {
+        "name": "aiassistant-admin",
+        "description": "Administrator role with full system access",
+        "composite": false,
+        "clientRole": false
+      },
+      {
+        "name": "user",
+        "description": "Default application user role",
+        "composite": false,
+        "clientRole": false
+      },
+      {
+        "name": "hr",
+        "description": "HR role for recruitment and people-related features",
+        "composite": false,
+        "clientRole": false
+      },
+      {
+        "name": "ceo",
+        "description": "CEO role for executive-level access",
+        "composite": false,
+        "clientRole": false
+      }
+    ]
+  },
+
+  "clients": [
+    {
+      "clientId": "ai-assistant-api-test",
+      "name": "Ai Assistant API",
+      "description": "Client for API testing (Swagger / Postman)",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "authorizationServicesEnabled": false,
+      "fullScopeAllowed": true,
+      "protocol": "openid-connect",
+      "rootUrl": "",
+      "baseUrl": "",
+      "redirectUris": [
+        "http://localhost:5221/*"
+      ],
+      "webOrigins": [
+        "http://localhost:5221"
+      ],
+      "protocolMappers": [
+        {
+          "name": "audience-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "ai-assistant-api-test",
+            "id.token.claim": "false",
+            "access.token.claim": "true"
+          }
+        }
+      ],
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ]
+    }
+  ],
+
+  "users": [
+    {
+      "username": "mikloscsaba",
+      "email": "mikloscsaba@aiassistant.local",
+      "firstName": "Csaba",
+      "lastName": "Miklos",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "temporary": false,
+          "secretData": "{\"value\":\"NSwdkxPIhbxfIZBAtT7rA41kpQih8Dl8IIOiFOuwM2JRgqjMCS5mUEN1rDYKHxc/lChazK/GzDibNLj8tTsAWw==\",\"salt\":\"EjRWeJq83vASNFZ4mrze8A==\",\"additionalParameters\":{}}",
+          "credentialData": "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
+        }
+      ],
+      "realmRoles": [
+        "hr"
+      ]
+    },
+    {
+      "username": "butorgergo",
+      "email": "butorgergo@aiassistant.local",
+      "firstName": "Gergely",
+      "lastName": "Butor",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "temporary": false,
+          "secretData": "{\"value\":\"NSwdkxPIhbxfIZBAtT7rA41kpQih8Dl8IIOiFOuwM2JRgqjMCS5mUEN1rDYKHxc/lChazK/GzDibNLj8tTsAWw==\",\"salt\":\"EjRWeJq83vASNFZ4mrze8A==\",\"additionalParameters\":{}}",
+          "credentialData": "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
+        }
+      ],
+      "realmRoles": [
+        "user"
+      ]
+    },
+    {
+      "username": "johndoe",
+      "email": "johndoe@aiassistant.local",
+      "firstName": "John",
+      "lastName": "Doe",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "temporary": false,
+          "secretData": "{\"value\":\"NSwdkxPIhbxfIZBAtT7rA41kpQih8Dl8IIOiFOuwM2JRgqjMCS5mUEN1rDYKHxc/lChazK/GzDibNLj8tTsAWw==\",\"salt\":\"EjRWeJq83vASNFZ4mrze8A==\",\"additionalParameters\":{}}",
+          "credentialData": "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
+        }
+      ],
+      "realmRoles": [
+        "ceo"
+      ]
+    }
+  ]
+}

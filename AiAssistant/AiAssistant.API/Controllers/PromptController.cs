@@ -68,6 +68,15 @@ namespace AiAssistant.API.Controllers
 
             var tags = request.Tags?.Where(t => !string.IsNullOrWhiteSpace(t)).ToArray() ?? Array.Empty<string>();
 
+            var hasContractTag = tags.Any(t => t.Equals("CONTRACT", StringComparison.OrdinalIgnoreCase));
+            if (hasContractTag && !User.IsInRole("ceo") && !User.IsInRole("hr"))
+            {
+                _logger.LogWarning(
+                    "Access denied to CONTRACT documents. User={User}",
+                    User.Identity?.Name);
+                return Forbid();
+            }
+
             using var scope = _logger.BeginScope(new Dictionary<string, object>
             {
                 ["Question"] = request.Question,
@@ -141,14 +150,16 @@ namespace AiAssistant.API.Controllers
                 });
 
                 _logger.LogInformation(
-                    "Document search finished. EvidenceFound={EvidenceFound}, Reason='{Reason}', FinalAnswer='{FinalAnswer}'",
+                    "Document search finished. EvidenceFound={EvidenceFound}, Reason='{Reason}', FinalAnswer='{FinalAnswer}', Final GPT answer='{GptAnswer}",
                     ragResult.EvidenceFound,
                     ragResult.Reason,
-                    ragResult.Answer);
+                    ragResult.Answer,
+                    ragResult.GptAnswer);
 
                 return Ok(new
                 {
                     answer = ragResult.Answer,
+                    gptAnswer = ragResult.GptAnswer,
                     diagnostic = new
                     {
                         ragResult.EvidenceFound,

@@ -127,6 +127,30 @@
       "name": "Documents",
       "item": [
         {
+          "name": "Delete Document (HR only)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/document?documentName=munkaszerzodes_medior_szakerto_fixed.pdf",
+              "host": ["{{base_url}}"],
+              "path": ["api", "document"],
+              "query": [
+                {
+                  "key": "documentName",
+                  "value": "munkaszerzodes_medior_szakerto_fixed.pdf",
+                  "description": "A törlendő dokumentum fájlneve (pontosan ahogy fel lett töltve)"
+                }
+              ]
+            }
+          }
+        },
+        {
           "name": "Upload PDF (HR only)",
           "request": {
             "method": "POST",

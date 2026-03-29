@@ -55,6 +55,24 @@ namespace AiAssistant.API.Utils
             await _client.UpsertAsync(_collectionName, [point]);
         }
 
+        public async Task<UpdateResult> DeleteByDocumentNameAsync(string documentName)
+        {
+            return await _client.DeleteAsync(_collectionName, new Filter
+            {
+                Must =
+                {
+                    new Condition
+                    {
+                        Field = new FieldCondition
+                        {
+                            Key = "document_name",
+                            Match = new Match { Keyword = documentName }
+                        }
+                    }
+                }
+            });
+        }
+
         public async Task<List<DocumentSearchResult>> SearchAsync(
             float[] queryVector,
             int topK = 5,

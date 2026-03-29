@@ -179,7 +179,7 @@ namespace AiAssistant.API.Controllers
                         await _qdrantService.UpsertChunkAsync(new DocumentChunkPoint
                         {
                             Text = chunks[i],
-                            Vector = embedding,
+                            Vector = embedding ?? [],
                             Tags = tagList,
                             Creator = creator,
                             DocumentName = file.FileName,
@@ -241,6 +241,25 @@ namespace AiAssistant.API.Controllers
             }
         }
 
+        /// <summary>
+        /// HR deletes all chunks belonging to a document by its file name.
+        /// </summary>
+        [HttpDelete]
+        [Authorize(Roles = "hr")]
+        public async Task<IActionResult> Delete([FromQuery] string documentName)
+        {
+            if (string.IsNullOrWhiteSpace(documentName))
+                return BadRequest("documentName is required.");
+
+            var result = await _qdrantService.DeleteByDocumentNameAsync(documentName);
+
+            _logger.LogInformation(
+                "Document deleted. DocumentName={DocumentName}, Status={Status}",
+                documentName, result.Status);
+
+            return Ok(new { documentName, status = result.Status.ToString() });
+        }
+
         private string[] ParseTags(string? tags)
         {
             if (string.IsNullOrWhiteSpace(tags))
@@ -260,7 +279,10 @@ namespace AiAssistant.API.Controllers
                 }
             }
 
-            return tags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            return tags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                       .Select(t => t.Trim('[', ']'))
+                       .Where(t => !string.IsNullOrWhiteSpace(t))
+                       .ToArray();
         }
     }
 }

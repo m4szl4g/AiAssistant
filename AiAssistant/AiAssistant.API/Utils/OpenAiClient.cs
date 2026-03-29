@@ -38,6 +38,14 @@ namespace AiAssistant.API.Utils
             try
             {
                 using var response = await _http.PostAsJsonAsync("/v1/chat/completions", payload, cancellationToken);
+
+                if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+                {
+                    var body = await response.Content.ReadAsStringAsync(cancellationToken);
+                    _logger.LogWarning("OpenAI 429. Model={Model}, Body={Body}", _config.Model, body);
+                    return null;
+                }
+
                 response.EnsureSuccessStatusCode();
 
                 var result = await response.Content.ReadFromJsonAsync<OpenAiChatResponse>(cancellationToken: cancellationToken);

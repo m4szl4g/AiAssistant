@@ -1,0 +1,63 @@
+@startuml AiAssistant – Container Diagram
+
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 13
+skinparam roundcorner 10
+skinparam ArrowColor #555555
+skinparam ArrowThickness 1.5
+
+skinparam rectangle {
+    BackgroundColor #DAE8FC
+    BorderColor #6C8EBF
+    FontColor #1a1a1a
+    BorderThickness 2
+}
+
+skinparam database {
+    BackgroundColor #FFF2CC
+    BorderColor #D6B656
+    FontColor #1a1a1a
+}
+
+skinparam cloud {
+    BackgroundColor #D5E8D4
+    BorderColor #82B366
+    FontColor #1a1a1a
+}
+
+skinparam actor {
+    BackgroundColor #f5f5f5
+    BorderColor #999999
+}
+
+title AiAssistant – High Level Container Diagram
+
+actor "Client\n(Browser / Postman)" as Client
+
+rectangle "Keycloak\n──────────\nJWT auth\nRealm: ai-assistant\nRoles: user, hr" as Keycloak
+
+rectangle "AiAssistant API\n──────────\n.NET 10 / ASP.NET Core\nDokumentum feltöltés & keresés\nSQL generálás\nRAG pipeline" as API
+
+rectangle "Ollama\n──────────\nbge-m3  →  embedding\nqwen2.5:1.5b  →  generálás\nCPU inference" as Ollama
+
+database "Qdrant\n──────────\nVektor adatbázis\n1024-dim cosine\nDokumentum chunkok" as Qdrant
+
+cloud "OpenAI API\n──────────\ngpt-4o-mini\n(opcionális összehasonlítás)" as OpenAI
+
+' Auth
+Client --> Keycloak : JWT token kérés
+Client --> API : REST kérések\n(Bearer JWT)
+API --> Keycloak : JWKS validáció\n(induláskor)
+
+' Upload pipeline
+API --> Ollama : chunk embedding\n(bge-m3)
+API --> Qdrant : vektorok tárolása\n(gRPC)
+
+' RAG search pipeline
+API --> Ollama : query embedding (bge-m3)\n+ válasz generálás (qwen2.5:1.5b)
+API --> Qdrant : szemantikus keresés\n(topK=7, tag filter)
+API --> OpenAI : párhuzamos GPT válasz\n(ha API key konfigurálva)
+
+
+@enduml

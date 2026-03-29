@@ -57,6 +57,47 @@ services:
       ollama pull bge-m3 || true &&
       wait
       "
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: aiassistant
+      POSTGRES_USER: aiuser
+      POSTGRES_PASSWORD: aipassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aiuser -d aiassistant"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  agentic:
+    build:
+      context: .
+      dockerfile: AiAssistant.Agentic.API/Dockerfile
+    ports:
+      - "5222:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      Qdrant__Host: qdrant
+      Qdrant__Port: 6334
+      Ollama__BaseUrl: http://ollama:11434
+      Keycloak__Authority: http://keycloak:8080/realms/ai-assistant
+      Keycloak__TokenIssuer: http://localhost:8190/realms/ai-assistant
+      Postgres__ConnectionString: Host=postgres;Port=5432;Database=aiassistant;Username=aiuser;Password=aipassword
+    depends_on:
+      postgres:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+      ollama:
+        condition: service_started
+
 volumes:
   qdrant_storage:
   ollama_data:
+  postgres_data:

@@ -1,13 +1,14 @@
 {
   "info": {
-    "name": "AiAssistant API",
+    "name": "AiAssistant Agentic API",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    { "key": "base_url",      "value": "http://localhost:5221" },
-    { "key": "keycloak_url",  "value": "http://localhost:8190" },
-    { "key": "client_id",     "value": "ai-assistant-api-test" },
-    { "key": "token",         "value": "" }
+    { "key": "base_url",     "value": "http://localhost:5222" },
+    { "key": "keycloak_url", "value": "http://localhost:8190" },
+    { "key": "client_id",    "value": "ai-assistant-api-test" },
+    { "key": "token",        "value": "" },
+    { "key": "password",     "value": "" }
   ],
   "item": [
     {
@@ -39,42 +40,6 @@
                 { "key": "grant_type", "value": "password" },
                 { "key": "client_id",  "value": "{{client_id}}" },
                 { "key": "username",   "value": "mikloscsaba" },
-                { "key": "password",   "value": "{{password}}" }
-              ]
-            },
-            "url": {
-              "raw": "{{keycloak_url}}/realms/ai-assistant/protocol/openid-connect/token",
-              "host": ["{{keycloak_url}}"],
-              "path": ["realms", "ai-assistant", "protocol", "openid-connect", "token"]
-            }
-          }
-        },
-        {
-          "name": "Get Token – User (butorgergo)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "var json = pm.response.json();",
-                  "if (json.access_token) {",
-                  "    pm.collectionVariables.set('token', json.access_token);",
-                  "    console.log('Token saved.');",
-                  "}"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "urlencoded",
-              "urlencoded": [
-                { "key": "grant_type", "value": "password" },
-                { "key": "client_id",  "value": "{{client_id}}" },
-                { "key": "username",   "value": "butorgergo" },
                 { "key": "password",   "value": "{{password}}" }
               ]
             },
@@ -120,132 +85,40 @@
               "path": ["realms", "ai-assistant", "protocol", "openid-connect", "token"]
             }
           }
-        }
-      ]
-    },
-    {
-      "name": "Documents",
-      "item": [
-        {
-          "name": "Delete Document (HR only)",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/document?documentName=munkaszerzodes_medior_szakerto_fixed.pdf",
-              "host": ["{{base_url}}"],
-              "path": ["api", "document"],
-              "query": [
-                {
-                  "key": "documentName",
-                  "value": "munkaszerzodes_medior_szakerto_fixed.pdf",
-                  "description": "A törlendő dokumentum fájlneve (pontosan ahogy fel lett töltve)"
-                }
-              ]
-            }
-          }
         },
         {
-          "name": "Upload PDF (HR only)",
+          "name": "Get Token – User (butorgergo)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.access_token) {",
+                  "    pm.collectionVariables.set('token', json.access_token);",
+                  "    console.log('Token saved.');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [],
             "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "file",
-                  "type": "file",
-                  "src": "",
-                  "description": "Select a PDF file"
-                },
-                {
-                  "key": "tags",
-                  "value": "HR Policy,Benefits",
-                  "type": "text",
-                  "description": "Comma-separated or JSON array: [\"HR Policy\",\"Benefits\"]"
-                }
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "grant_type", "value": "password" },
+                { "key": "client_id",  "value": "{{client_id}}" },
+                { "key": "username",   "value": "butorgergo" },
+                { "key": "password",   "value": "{{password}}" }
               ]
             },
             "url": {
-              "raw": "{{base_url}}/api/document/upload",
-              "host": ["{{base_url}}"],
-              "path": ["api", "document", "upload"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Prompt",
-      "item": [
-        {
-          "name": "SQL Query",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{token}}" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"question\": \"List all employees\"\n}",
-              "options": { "raw": { "language": "json" } }
-            },
-            "url": {
-              "raw": "{{base_url}}/api/prompt",
-              "host": ["{{base_url}}"],
-              "path": ["api", "prompt"]
-            }
-          }
-        },
-        {
-          "name": "Document Search",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{token}}" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"question\": \"Mi a szabadságolási rend?\",\n  \"tags\": [\"HR Policy\"]\n}",
-              "options": { "raw": { "language": "json" } }
-            },
-            "url": {
-              "raw": "{{base_url}}/api/prompt/document",
-              "host": ["{{base_url}}"],
-              "path": ["api", "prompt", "document"]
-            }
-          }
-        },
-        {
-          "name": "Document Search – tag szűrő nélkül",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{token}}" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"question\": \"Milyen juttatások járnak az alkalmazottaknak?\"\n}",
-              "options": { "raw": { "language": "json" } }
-            },
-            "url": {
-              "raw": "{{base_url}}/api/prompt/document",
-              "host": ["{{base_url}}"],
-              "path": ["api", "prompt", "document"]
+              "raw": "{{keycloak_url}}/realms/ai-assistant/protocol/openid-connect/token",
+              "host": ["{{keycloak_url}}"],
+              "path": ["realms", "ai-assistant", "protocol", "openid-connect", "token"]
             }
           }
         }
@@ -255,11 +128,11 @@
       "name": "Agent",
       "item": [
         {
-          "name": "Agent Ask",
+          "name": "Ask – szerződés + DB kombináció",
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Content-Type",  "value": "application/json" },
               { "key": "Authorization", "value": "Bearer {{token}}" }
             ],
             "body": {
@@ -268,10 +141,88 @@
               "options": { "raw": { "language": "json" } }
             },
             "url": {
-              "raw": "http://localhost:5222/api/agent/ask",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "5222",
+              "raw": "{{base_url}}/api/agent/ask",
+              "host": ["{{base_url}}"],
+              "path": ["api", "agent", "ask"]
+            }
+          }
+        },
+        {
+          "name": "Ask – szerződés kérdés (CONTRACT)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Mi Kovács Márton pozíciója és mennyi a bruttó fizetése?\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/agent/ask",
+              "host": ["{{base_url}}"],
+              "path": ["api", "agent", "ask"]
+            }
+          }
+        },
+        {
+          "name": "Ask – HR szabályzat kérdés",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Mennyi a felmondási idő?\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/agent/ask",
+              "host": ["{{base_url}}"],
+              "path": ["api", "agent", "ask"]
+            }
+          }
+        },
+        {
+          "name": "Ask – adatbázis kérdés",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Kik dolgoznak az Engineering részlegen?\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/agent/ask",
+              "host": ["{{base_url}}"],
+              "path": ["api", "agent", "ask"]
+            }
+          }
+        },
+        {
+          "name": "Ask – szabadság kérelem státusz",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Milyen jóváhagyott szabadságkérelmei vannak Szabó Mártonnak?\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/agent/ask",
+              "host": ["{{base_url}}"],
               "path": ["api", "agent", "ask"]
             }
           }
@@ -279,10 +230,10 @@
       ]
     },
     {
-      "name": "Auth check – 401 tesztek",
+      "name": "Auth check",
       "item": [
         {
-          "name": "Prompt token nélkül – 401",
+          "name": "Ask token nélkül – 401",
           "request": {
             "method": "POST",
             "header": [
@@ -294,39 +245,9 @@
               "options": { "raw": { "language": "json" } }
             },
             "url": {
-              "raw": "{{base_url}}/api/prompt",
+              "raw": "{{base_url}}/api/agent/ask",
               "host": ["{{base_url}}"],
-              "path": ["api", "prompt"]
-            }
-          }
-        },
-        {
-          "name": "Upload user tokennel – 403 (nem HR)",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" }
-            ],
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "file",
-                  "type": "file",
-                  "src": "",
-                  "description": "Bármilyen PDF"
-                },
-                {
-                  "key": "tags",
-                  "value": "test",
-                  "type": "text"
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{base_url}}/api/document/upload",
-              "host": ["{{base_url}}"],
-              "path": ["api", "document", "upload"]
+              "path": ["api", "agent", "ask"]
             }
           }
         }

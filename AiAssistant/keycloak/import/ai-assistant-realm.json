@@ -61,10 +61,12 @@
       "rootUrl": "",
       "baseUrl": "",
       "redirectUris": [
-        "http://localhost:5221/*"
+        "http://localhost:5221/*",
+        "http://localhost:5222/*"
       ],
       "webOrigins": [
-        "http://localhost:5221"
+        "http://localhost:5221",
+        "http://localhost:5222/*"
       ],
       "protocolMappers": [
         {
@@ -104,12 +106,7 @@
       "enabled": true,
       "emailVerified": true,
       "credentials": [
-        {
-          "type": "password",
-          "temporary": false,
-          "secretData": "{\"value\":\"NSwdkxPIhbxfIZBAtT7rA41kpQih8Dl8IIOiFOuwM2JRgqjMCS5mUEN1rDYKHxc/lChazK/GzDibNLj8tTsAWw==\",\"salt\":\"EjRWeJq83vASNFZ4mrze8A==\",\"additionalParameters\":{}}",
-          "credentialData": "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
-        }
+        { "type": "password", "value": "Password1", "temporary": false }
       ],
       "realmRoles": [
         "hr"
@@ -123,12 +120,7 @@
       "enabled": true,
       "emailVerified": true,
       "credentials": [
-        {
-          "type": "password",
-          "temporary": false,
-          "secretData": "{\"value\":\"NSwdkxPIhbxfIZBAtT7rA41kpQih8Dl8IIOiFOuwM2JRgqjMCS5mUEN1rDYKHxc/lChazK/GzDibNLj8tTsAWw==\",\"salt\":\"EjRWeJq83vASNFZ4mrze8A==\",\"additionalParameters\":{}}",
-          "credentialData": "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
-        }
+        { "type": "password", "value": "Password1", "temporary": false }
       ],
       "realmRoles": [
         "user"
@@ -142,12 +134,7 @@
       "enabled": true,
       "emailVerified": true,
       "credentials": [
-        {
-          "type": "password",
-          "temporary": false,
-          "secretData": "{\"value\":\"NSwdkxPIhbxfIZBAtT7rA41kpQih8Dl8IIOiFOuwM2JRgqjMCS5mUEN1rDYKHxc/lChazK/GzDibNLj8tTsAWw==\",\"salt\":\"EjRWeJq83vASNFZ4mrze8A==\",\"additionalParameters\":{}}",
-          "credentialData": "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
-        }
+        { "type": "password", "value": "Password1", "temporary": false }
       ],
       "realmRoles": [
         "ceo"
